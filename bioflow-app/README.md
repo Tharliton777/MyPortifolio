@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 BioFlow - Tudo o que você é, em um só link.
 
-## Getting Started
+O **BioFlow** é uma plataforma SaaS moderna no estilo "Link na Bio", projetada para criadores de conteúdo, marcas e profissionais que desejam reunir todos os seus links importantes em uma única página personalizada e de alta conversão.
 
-First, run the development server:
+![BioFlow Preview](https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Principais Funcionalidades
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Autenticação Segura:** Login rápido e seguro (E-mail/Senha e provedores OAuth).
+- **Dashboard Intuitivo:** Painel de controle com "Live Preview" (visualização em tempo real) do perfil no celular.
+- **Temas e Personalização:** Dezenas de temas pré-prontos, cores sólidas, gradientes e envio de foto de perfil e capa.
+- **Gestão de Links com Drag & Drop:** Adicione imagens aos links, ative/desative e reordene facilmente.
+- **Sistema de Onboarding:** Garanta sua URL única (`bioflow.com/seunome`) em poucos segundos.
+- **Painel Admin:** Controle de usuários, bloqueio de contas e métricas de crescimento (MRR, leads e status VIP/Selo de Verificado).
+- **Planos (Pricing):** Estrutura de assinatura (Free, Starter, Pro, Premium).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tecnologias Utilizadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Este projeto foi construído com as tecnologias mais modernas do mercado para garantir performance e escalabilidade:
 
-## Learn More
+- **[Next.js (App Router)](https://nextjs.org/):** Framework React para SSR e roteamento dinâmico inteligente.
+- **[Tailwind CSS](https://tailwindcss.com/):** Estilização ágil, moderna e responsiva (com Glassmorphism e animações).
+- **[Supabase](https://supabase.com/):** Backend as a Service (BaaS) para Autenticação, Banco de Dados PostgreSQL (com RLS) e Storage de imagens.
+- **[Vercel](https://vercel.com/):** Deploy e hospedagem contínua.
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Como rodar o projeto localmente
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone o repositório:**
+   ```bash
+   git clone [https://github.com/SEU_USUARIO/bioflow.git](https://github.com/SEU_USUARIO/bioflow.git)
+   cd bioflow
