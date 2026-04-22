@@ -28,4 +28,4 @@ Este projeto foi construído com as tecnologias mais modernas do mercado para ga
 1. **Clone o repositório:**
    ```bash
    git clone [https://github.com/SEU_USUARIO/bioflow.git](https://github.com/SEU_USUARIO/bioflow.git)
-   cd bioflow
+   cd bioflow 
