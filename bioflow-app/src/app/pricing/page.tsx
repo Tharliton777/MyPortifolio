@@ -76,34 +76,37 @@ export default function PricingPage() {
         }
       `}} />
 
-      {/* NAVEGAÇÃO SUPERIOR */}
-      <nav className="!w-full !bg-white !sticky !top-0 !z-50 !h-20 !flex !items-center !justify-between !px-6 lg:!px-10 !shadow-sm">
-        <div className="!flex !items-center !gap-8 !h-full">
-          <div onClick={() => router.push("/")} className="!flex !items-center !gap-2 !cursor-pointer !font-bold !text-xl !tracking-tight">
+      {/* NAVEGAÇÃO SUPERIOR (Atualizada e Sincronizada) */}
+      <nav className="!w-full !bg-[#F6F7F5] !sticky !top-0 !z-50 !h-24 !flex !items-center !justify-between !px-6 lg:!px-12 !transition-all border-b border-gray-200/50 backdrop-blur-md">
+        <div className="!flex !items-center !gap-12 !h-full">
+          <div 
+            onClick={() => router.push("/")}
+            className="!flex !items-center !gap-2 !cursor-pointer !font-black !text-2xl !tracking-tight"
+          >
             BioFlow
-            <svg className="!w-5 !h-5 !mt-0.5 !text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="!w-6 !h-6 !text-sky-500 !-mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
           </div>
-          <div className="!hidden md:!flex !items-center !gap-6 !text-sm !font-semibold !text-gray-600 !h-full">
-            <button className="hover:!text-black !transition-colors">Produtos</button>
-            <button className="hover:!text-black !transition-colors">Modelos</button>
-            <button className="!text-black border-b-2 !border-black !h-full !px-1 !pt-1">Preços</button>
+          <div className="!hidden md:!flex !items-center !gap-8 !text-[15px] !font-bold !text-gray-600">
+            <button onClick={() => router.push("/modelos")} className="hover:!text-black !transition-colors">Modelos</button>
+            <button className="hover:!text-black !transition-colors">Descobrir</button>
+            <button onClick={() => router.push("/pricing")} className="!text-black !border-b-2 !border-black !py-1">Preços</button>
           </div>
         </div>
         <div className="!flex !items-center !gap-4">
           {isAuthenticated ? (
-            <button onClick={() => router.push("/dashboard")} className="!text-sm !font-semibold !bg-gray-100 hover:!bg-gray-200 !text-black !px-5 !py-2.5 !rounded-full !transition-colors">
-              Meu Dashboard
+            <button onClick={() => router.push("/dashboard")} className="!text-[15px] !font-bold !bg-black hover:!bg-gray-800 !text-white !px-6 !py-3 !rounded-full !transition-colors">
+              Painel
             </button>
           ) : (
             <>
-              <button onClick={() => router.push("/login")} className="!text-sm !font-semibold !bg-gray-100 hover:!bg-gray-200 !text-black !px-5 !py-2.5 !rounded-full !transition-colors !hidden sm:!block">
+              <button onClick={() => router.push("/login")} className="!text-[15px] !font-bold !bg-gray-200 hover:!bg-gray-300 !text-black !px-6 !py-3 !rounded-full !transition-colors !hidden sm:!block">
                 Entrar
               </button>
-              <button onClick={() => router.push("/register")} className="!text-sm !font-semibold !bg-black hover:!bg-gray-800 !text-white !px-5 !py-2.5 !rounded-full !transition-colors">
-                Cadastre-se
+              <button onClick={() => router.push("/register")} className="!text-[15px] !font-bold !bg-black hover:!bg-gray-800 !text-white !px-6 !py-3 !rounded-full !transition-colors">
+                Criar meu BioFlow
               </button>
             </>
           )}

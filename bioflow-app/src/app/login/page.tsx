@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+// IMPORTANTE: Adicionado o useSearchParams
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 export default function LoginPage() {
@@ -10,11 +11,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mensagemErro, setMensagemErro] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams(); // Ler parâmetros da URL
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMensagemErro("");
+
+    // Pega o tema da URL, se existir (ex: sunset)
+    const themeParam = searchParams.get("theme");
 
     try {
       let authUser = null;
@@ -56,10 +61,13 @@ export default function LoginPage() {
           .eq('id', authUser.id)
           .single();
 
+        // Constrói a URL final de redirecionamento, repassando o tema se ele existir
+        const themeQueryString = themeParam ? `?theme=${themeParam}` : "";
+
         if (profile && profile.username) {
-          router.push("/dashboard");
+          router.push(`/dashboard${themeQueryString}`);
         } else {
-          router.push("/onboarding");
+          router.push(`/onboarding${themeQueryString}`);
         }
       }
 

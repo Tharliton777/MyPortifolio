@@ -41,7 +41,8 @@ export default function LandingPage() {
             </svg>
           </div>
           <div className="!hidden md:!flex !items-center !gap-8 !text-[15px] !font-bold !text-gray-600">
-            <button className="hover:!text-black !transition-colors">Modelos</button>
+            {/* 👇 BOTÃO ATUALIZADO AQUI 👇 */}
+            <button onClick={() => router.push("/modelos")} className="hover:!text-black !transition-colors">Modelos</button>
             <button className="hover:!text-black !transition-colors">Descobrir</button>
             <button onClick={() => router.push("/pricing")} className="hover:!text-black !transition-colors">Preços</button>
           </div>

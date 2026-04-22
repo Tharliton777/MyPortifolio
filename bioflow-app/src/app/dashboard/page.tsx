@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
 interface LinkItem {
@@ -15,7 +15,8 @@ interface LinkItem {
 
 export default function DashboardPage() {
   const router = useRouter();
-
+  const searchParams = useSearchParams();
+  
   // ==========================================
   // ESTADOS GLOBAIS E NAVEGAÇÃO
   // ==========================================
@@ -81,7 +82,7 @@ export default function DashboardPage() {
   // ==========================================
   useEffect(() => {
     loadData();
-  }, [router]);
+  }, [router, searchParams]);
 
   async function loadData() {
     const {
@@ -91,6 +92,22 @@ export default function DashboardPage() {
     if (!user) {
       router.push("/login");
       return;
+    }
+
+    // ==========================================
+    // CAPTURA DE TEMA VIA URL (NOVO)
+    // ==========================================
+    const themeParam = searchParams.get("theme");
+
+    if (themeParam) {
+      // Atualiza o banco de dados imediatamente com o tema escolhido na vitrine
+      await supabase.from("profiles").update({ theme: themeParam }).eq("id", user.id);
+      
+      // Muda a aba ativa para a pessoa já ver o preview na hora
+      setActiveTab("appearance");
+      
+      // Limpa a URL silenciosamente (tira o ?theme=)
+      router.replace("/dashboard");
     }
 
     const { data: profileData, error: profileError } = await supabase
@@ -107,19 +124,23 @@ export default function DashboardPage() {
         ? profileData.username.toLowerCase().replace(/[^a-z0-9_.-]/g, "")
         : "";
 
-      setProfile({ ...profileData, username: safeUsername });
+      // Decide qual tema usar (o que acabou de vir da URL ou o que já estava no banco)
+      const appliedTheme = themeParam || profileData.theme;
+
+      // Salvamos no estado do React já com o tema correto aplicado
+      setProfile({ ...profileData, username: safeUsername, theme: appliedTheme });
       setEditUsername(safeUsername);
       setEditDisplayName(profileData.display_name || "");
       setEditBio(profileData.bio || "");
 
-      if (profileData.theme?.startsWith("gradient:")) {
-        const colors = profileData.theme.replace("gradient:", "").split(",");
+      if (appliedTheme?.startsWith("gradient:")) {
+        const colors = appliedTheme.replace("gradient:", "").split(",");
         if (colors.length === 2) {
           setCustomGrad1(colors[0]);
           setCustomGrad2(colors[1]);
         }
-      } else if (profileData.theme?.startsWith("#")) {
-        setCustomColor(profileData.theme);
+      } else if (appliedTheme?.startsWith("#")) {
+        setCustomColor(appliedTheme);
       }
     }
 
