@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import Link from "next/link"; // <-- Importação do Link adicionada
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -147,15 +148,27 @@ function LoginContent() {
                 className="!w-full !h-14 !px-6 !bg-[#F6F7F5] !border !border-transparent focus:!bg-white !rounded-2xl !text-black placeholder:!text-gray-500 focus:!outline-none focus:!border-black focus:!ring-1 focus:!ring-black !transition-all !text-base !font-medium"
               />
               
-              <input
-                type="password"
-                placeholder="Senha"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="!w-full !h-14 !px-6 !bg-[#F6F7F5] !border !border-transparent focus:!bg-white !rounded-2xl !text-black placeholder:!text-gray-500 focus:!outline-none focus:!border-black focus:!ring-1 focus:!ring-black !transition-all !text-base !font-medium"
-              />
+              <div className="!flex !flex-col !gap-1">
+                <input
+                  type="password"
+                  placeholder="Senha"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="!w-full !h-14 !px-6 !bg-[#F6F7F5] !border !border-transparent focus:!bg-white !rounded-2xl !text-black placeholder:!text-gray-500 focus:!outline-none focus:!border-black focus:!ring-1 focus:!ring-black !transition-all !text-base !font-medium"
+                />
+                
+                {/* === NOVO: LINK DE ESQUECEU A SENHA AQUI === */}
+                <div className="!flex !justify-end !px-1">
+                  <Link 
+                    href="/forgot-password" 
+                    className="!text-[13px] !text-gray-500 hover:!text-black !transition-colors !font-medium"
+                  >
+                    Esqueceu a senha?
+                  </Link>
+                </div>
+              </div>
 
               {mensagemErro && (
                 <p className="!text-red-500 !text-sm !font-bold !text-center !mt-1">{mensagemErro}</p>

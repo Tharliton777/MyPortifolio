@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import Link from "next/link"; // <-- IMPORT AQUI
 
 export const dynamic = 'force-dynamic';
 
@@ -162,12 +163,14 @@ export default async function PublicProfilePage({ params }: Props) {
           overscroll-behavior: none;
         }
 
-        /* ANIMAÇÃO MODAL DO PERFIL */
-        #share-toggle:checked ~ #share-modal {
+        /* ANIMAÇÃO MODAL DO PERFIL E DO NOVO MODAL DE COOKIES */
+        #share-toggle:checked ~ #share-modal,
+        #cookie-toggle:checked ~ #cookie-modal {
           opacity: 1 !important;
           visibility: visible !important;
         }
-        #share-toggle:checked ~ #share-modal #share-card {
+        #share-toggle:checked ~ #share-modal #share-card,
+        #cookie-toggle:checked ~ #cookie-modal #cookie-card {
           transform: translateY(0) scale(1) !important;
         }
 
@@ -178,6 +181,19 @@ export default async function PublicProfilePage({ params }: Props) {
         }
         .link-toggle:checked + .link-modal .link-card {
           transform: translateY(0) scale(1) !important;
+        }
+
+        /* ESTILO PARA A SCROLLBAR DO MODAL DE COOKIES */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 8px;
         }
       `}} />
 
@@ -190,7 +206,7 @@ export default async function PublicProfilePage({ params }: Props) {
       >
         
         {/* ÍCONES DO TOPO */}
-        <a href="/register" className={`absolute top-6 left-6 sm:top-8 sm:left-8 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-colors backdrop-blur-md shadow-sm ${darkTextNeeded ? "bg-black/20 text-white hover:bg-black/40 border border-white/10" : "bg-white/80 text-black hover:bg-white border border-gray-200"}`}>
+        <a href="/login" className={`absolute top-6 left-6 sm:top-8 sm:left-8 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-colors backdrop-blur-md shadow-sm ${darkTextNeeded ? "bg-black/20 text-white hover:bg-black/40 border border-white/10" : "bg-white/80 text-black hover:bg-white border border-gray-200"}`}>
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
         </a>
         
@@ -242,9 +258,6 @@ export default async function PublicProfilePage({ params }: Props) {
                   rel="noopener noreferrer" 
                   className={`w-full min-h-[76px] py-[22px] px-14 rounded-[20px] flex items-center justify-center transition-colors duration-300 ease-out relative shadow-sm hover:shadow-md ${buttonClass}`}
                 >
-                  {(link as any).image_url && (
-                    <img src={(link as any).image_url} className="!w-[50px] !h-[50px] !rounded-xl !object-cover !absolute !left-3" alt="" />
-                  )}
                   <span className="font-bold text-[18px] text-center leading-tight">
                     {link.title}
                   </span>
@@ -261,7 +274,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
         <div className="w-full flex flex-col items-center pt-16 mt-auto z-20 gap-6">
           <a 
-            href="/register" 
+            href="/login" 
             className={`!inline-flex !items-center !justify-center !gap-2 !px-8 !py-4 !rounded-full !font-bold text-[16px] !shadow-lg hover:!shadow-2xl !transition-shadow !duration-300 !backdrop-blur-md ${darkTextNeeded ? "!bg-black/40 !text-white !border !border-white/10" : "!bg-white !text-black"}`}
           >
             <svg className="w-5 h-5 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -271,20 +284,25 @@ export default async function PublicProfilePage({ params }: Props) {
             Junte-se a {firstName} no BioFlow
           </a>
 
+          {/* === AQUI ESTÁ A ATUALIZAÇÃO DOS LINKS DO RODAPÉ === */}
           <div className={`flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] font-semibold opacity-70 px-4 !mb-8 ${darkTextNeeded ? "text-white" : "text-[#111827]"}`}>
-            <span className="cursor-pointer hover:underline">Preferências de cookies</span>
-            <span className="cursor-pointer hover:underline">Relatório</span>
-            <span className="cursor-pointer hover:underline">Privacidade</span>
-            <span className="cursor-pointer hover:underline">Explorar</span>
+            {/* AGORA ABRE O MODAL DE COOKIES EM VEZ DE SÓ UM LINK VAZIO */}
+            <label htmlFor="cookie-toggle" className="cursor-pointer hover:underline text-inherit no-underline">Preferências de cookies</label>
+            <Link href="/report" className="cursor-pointer hover:underline text-inherit no-underline">Relatório</Link>
+            <Link href="/privacidade" className="cursor-pointer hover:underline text-inherit no-underline">Privacidade</Link>
+            <Link href="/" className="cursor-pointer hover:underline text-inherit no-underline">Explorar</Link>
           </div>
+          {/* ==================================================== */}
+
         </div>
 
       </div>
 
       {/* ========================================== */}
-      {/* CHECKBOX INVISÍVEL (MODAL PERFIL) */}
+      {/* CHECKBOXES INVISÍVEIS PARA CONTROLAR MODAIS SEM JS  */}
       {/* ========================================== */}
       <input type="checkbox" id="share-toggle" className="hidden" />
+      <input type="checkbox" id="cookie-toggle" className="hidden" />
 
       {/* ========================================== */}
       {/* MODAL DE COMPARTILHAMENTO DO PERFIL */}
@@ -351,12 +369,93 @@ export default async function PublicProfilePage({ params }: Props) {
           <div className="w-full border-t border-gray-100 !pt-6 !mt-auto">
             <h4 className="font-bold text-gray-900 text-[16px] text-center !mb-2 !mt-0">Junte-se a {firstName} no BioFlow</h4>
             <p className="text-[13px] text-gray-500 font-medium text-center !mb-6 leading-relaxed">Obtenha seu próprio BioFlow gratuitamente.</p>
-            <a href="/register" className="w-full block !py-4 bg-black text-white text-center font-bold rounded-full text-[15px] shadow-md hover:shadow-lg transition-shadow no-underline">
+            <a href="/login" className="w-full block !py-4 bg-black text-white text-center font-bold rounded-full text-[15px] shadow-md hover:shadow-lg transition-shadow no-underline">
               Cadastre-se gratuitamente
             </a>
           </div>
         </div>
       </div>
+
+      {/* ========================================== */}
+      {/* NOVO: MODAL DE PREFERÊNCIAS DE COOKIES */}
+      {/* ========================================== */}
+      <div id="cookie-modal" className="fixed inset-0 z-[999] flex items-center justify-center p-4 opacity-0 invisible transition-all duration-300 ease-out">
+        <label htmlFor="cookie-toggle" className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default"></label>
+        
+        <div id="cookie-card" className="bg-white w-full max-w-[600px] max-h-[90vh] rounded-[24px] !p-6 sm:!p-8 relative z-10 shadow-2xl flex flex-col box-border overflow-hidden transform translate-y-4 scale-95 transition-all duration-300 ease-out">
+          
+          <label htmlFor="cookie-toggle" className="absolute top-5 right-5 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 cursor-pointer transition">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </label>
+          
+          <h2 className="text-[22px] font-bold text-gray-900 !mb-4 !pr-8">Personalize suas opções de cookies</h2>
+          
+          <div className="overflow-y-auto !pr-2 flex-1 custom-scrollbar">
+            <p className="text-[13px] text-gray-600 leading-relaxed !mb-6">
+              Nós e nossos fornecedores usamos cookies e tecnologias semelhantes para aprimorar sua experiência, analisar o tráfego do site, personalizar o conteúdo e oferecer publicidade direcionada. Os cookies necessários são essenciais para as funções básicas do site e não podem ser desativados. Para todas as categorias outras, precisamos do seu consentimento explícito. Analise as finalidades abaixo para fornecer ou cancelar a assinatura para cada categoria.
+            </p>
+
+            <div className="space-y-4 !mb-6">
+              {/* Cookie Necessário */}
+              <div className="border-b border-gray-200 !pb-4">
+                <div className="flex items-center justify-between !mb-2">
+                  <span className="font-bold text-gray-900 text-[15px]">Biscoitos necessários</span>
+                  <span className="text-[13px] text-gray-500 font-medium">Sempre ligado</span>
+                </div>
+                <p className="text-[13px] text-gray-500 leading-relaxed">Esses cookies são necessários para o funcionamento do site e não podem ser desativados em nossos sistemas. Geralmente, eles são definidos apenas em resposta às ações feitas por você que equivalem a uma solicitação de serviços. Eles não armazenam nenhuma informação de identificação pessoal.</p>
+              </div>
+
+              {/* Cookie de Desempenho */}
+              <div className="border-b border-gray-200 !pb-4">
+                <div className="flex items-center justify-between !mb-2">
+                  <span className="font-bold text-gray-900 text-[15px]">Cookies de desempenho</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8129D9]"></div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Cookies Normais/Funcionais */}
+              <div className="border-b border-gray-200 !pb-4">
+                <div className="flex items-center justify-between !mb-2">
+                  <span className="font-bold text-gray-900 text-[15px]">Cookies</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8129D9]"></div>
+                  </label>
+                </div>
+                <p className="text-[13px] text-gray-500 leading-relaxed">Esses cookies permitem que o site forneça funcionalidades e melhorias aprimoradas. Eles podem ser definidos por nós ou por fornecedores terceirizados cujos serviços adicionamos às nossas páginas. Se você não permitir esses cookies, alguns serviços podem não funcionar corretamente.</p>
+              </div>
+
+              {/* Cookie Publicidade */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-gray-900 text-[15px]">Cookies publicitários</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#8129D9]"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="!pt-4 !mt-auto bg-white flex flex-col gap-3">
+            <label htmlFor="cookie-toggle" className="w-full !py-3.5 border-2 border-gray-200 text-black font-bold rounded-full text-center cursor-pointer hover:bg-gray-50 transition-colors text-[15px]">
+              Salvar minhas escolhas
+            </label>
+            <label htmlFor="cookie-toggle" className="w-full !py-3.5 bg-black text-white font-bold rounded-full text-center cursor-pointer hover:bg-gray-800 transition-colors text-[15px]">
+              Aceitar tudo
+            </label>
+            <label htmlFor="cookie-toggle" className="w-full !py-3.5 bg-transparent text-gray-500 font-bold rounded-full text-center cursor-pointer hover:text-black transition-colors text-[15px]">
+              Rejeitar tudo
+            </label>
+          </div>
+
+        </div>
+      </div>
+
 
       {/* ========================================== */}
       {/* RENDERIZAÇÃO DOS MODAIS ESPECÍFICOS DE CADA LINK */}
@@ -386,7 +485,7 @@ export default async function PublicProfilePage({ params }: Props) {
                     <img src={linkImage} alt={link.title} className="w-[84px] h-[84px] rounded-2xl !mb-4 shadow-md object-cover shrink-0" />
                   ) : (
                     <div className="w-[84px] h-[84px] rounded-2xl bg-gray-700 !mb-4 flex items-center justify-center shadow-md shrink-0">
-                      <svg className="w-10 h-10 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                      <svg className="w-10 h-10 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
                     </div>
                   )}
                   <h3 className="text-white font-bold text-lg !mb-1">{link.title}</h3>
@@ -429,7 +528,7 @@ export default async function PublicProfilePage({ params }: Props) {
                 <div className="w-full border-t border-gray-100 !pt-6 !mt-auto">
                   <h4 className="font-bold text-gray-900 text-[16px] text-center !mb-2 !mt-0">Junte-se a {firstName} no BioFlow</h4>
                   <p className="text-[13px] text-gray-500 font-medium text-center !mb-6 leading-relaxed">Obtenha seu próprio BioFlow gratuitamente.</p>
-                  <a href="/register" className="w-full block !py-4 bg-black text-white text-center font-bold rounded-full text-[15px] shadow-md hover:shadow-lg transition-shadow no-underline">
+                  <a href="/login" className="w-full block !py-4 bg-black text-white text-center font-bold rounded-full text-[15px] shadow-md hover:shadow-lg transition-shadow no-underline">
                     Cadastre-se gratuitamente
                   </a>
                 </div>
