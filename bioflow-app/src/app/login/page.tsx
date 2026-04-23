@@ -1,24 +1,23 @@
 "use client";
 
-import { useState } from "react";
-// IMPORTANTE: Adicionado o useSearchParams
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [mensagemErro, setMensagemErro] = useState("");
   const router = useRouter();
-  const searchParams = useSearchParams(); // Ler parâmetros da URL
+  const searchParams = useSearchParams();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMensagemErro("");
 
-    // Pega o tema da URL, se existir (ex: sunset)
+    // Captura o tema da URL, se existir (ex: sunset)
     const themeParam = searchParams.get("theme");
 
     try {
@@ -61,7 +60,7 @@ export default function LoginPage() {
           .eq('id', authUser.id)
           .single();
 
-        // Constrói a URL final de redirecionamento, repassando o tema se ele existir
+        // Constrói a URL final de redirecionamento repassando o tema
         const themeQueryString = themeParam ? `?theme=${themeParam}` : "";
 
         if (profile && profile.username) {
@@ -206,5 +205,13 @@ export default function LoginPage() {
       </div>
 
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="!min-h-screen !bg-white !flex !items-center !justify-center"><div className="!animate-spin !rounded-full !h-12 !w-12 !border-t-2 !border-b-2 !border-black"></div></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
