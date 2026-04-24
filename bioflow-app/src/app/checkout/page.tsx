@@ -37,8 +37,6 @@ function CheckoutContent() {
   async function checkUser() {
     const { data: { session } } = await supabase.auth.getSession();
     
-    // NOTA: Para testar o visual sem login, vamos deixar o user como nulo
-    // Se fosse obrigar o login: if (!session) router.push('/login');
     if (session) {
       setUser(session.user);
     }
@@ -49,7 +47,6 @@ function CheckoutContent() {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simula o tempo de processamento de um gateway de pagamento (ex: 2 segundos)
     setTimeout(async () => {
       if (user) {
         // Se estiver logado, atualiza o plano no banco de dados para valer!
@@ -65,7 +62,7 @@ function CheckoutContent() {
 
   if (loading) {
     return (
-      <div className="!min-h-screen !bg-[#F6F7F5] !flex !items-center !justify-center">
+      <div className="!min-h-screen !bg-white !flex !items-center !justify-center">
         <div className="!animate-spin !rounded-full !h-12 !w-12 !border-t-2 !border-b-2 !border-sky-500"></div>
       </div>
     );
@@ -74,6 +71,16 @@ function CheckoutContent() {
   return (
     <div className="!min-h-screen !bg-white !font-sans !text-black !flex !flex-col">
       
+      {/* 👇 TRAVA DE OVERSCROLL ADICIONADA AQUI 👇 */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        html, body {
+          background-color: white;
+          overscroll-behavior: none;
+          margin: 0;
+          padding: 0;
+        }
+      `}} />
+
       {/* NAVEGAÇÃO SIMPLIFICADA (Para focar no checkout) */}
       <nav className="!w-full !bg-white !h-20 !flex !items-center !px-6 lg:!px-12 !border-b !border-gray-200">
         <Link href="/" className="!flex !items-center !gap-2 !cursor-pointer !font-black !text-2xl !tracking-tight">

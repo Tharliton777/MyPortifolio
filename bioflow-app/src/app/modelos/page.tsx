@@ -16,14 +16,10 @@ interface Template {
 export default function ModelosPage() {
   const router = useRouter();
   
-  // ==========================================
-  // ESTADOS DA PÁGINA
-  // ==========================================
   const [isLoading, setIsLoading] = useState(true);
-  const [isVisible, setIsVisible] = useState(false); // NOVO: Controla o fade-in do conteúdo
+  const [isVisible, setIsVisible] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  // Estados do Modal
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -32,8 +28,7 @@ export default function ModelosPage() {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user || null);
       
-      setIsLoading(false); // Tira o spinner
-      // NOVO: Espera um milissegundo e dispara a animação de opacidade
+      setIsLoading(false);
       setTimeout(() => setIsVisible(true), 50); 
     };
     checkAuth();
@@ -117,14 +112,21 @@ export default function ModelosPage() {
   ];
 
   const handleUseTemplate = (templateId: string) => {
-    router.push(user ? `/dashboard?theme=${templateId}` : `/register?theme=${templateId}`);
+    router.push(user ? `/dashboard?theme=${templateId}` : `/login?theme=${templateId}`);
   };
 
-  // Aqui está a MÁGICA: A NavBar agora fica FORA da verificação de "isLoading".
   return (
     <div className="!min-h-screen !bg-[#F6F7F5] !font-sans !text-[#111827] !relative">
       
-      {/* NAVEGAÇÃO SUPERIOR (Sempre visível, não pisca) */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        html, body {
+          background-color: #F6F7F5;
+          overscroll-behavior: none;
+          margin: 0;
+          padding: 0;
+        }
+      `}} />
+
       <nav className="!w-full !bg-[#F6F7F5] !sticky !top-0 !z-40 !h-24 !flex !items-center !justify-between !px-6 lg:!px-12 !transition-all border-b border-gray-200/50 backdrop-blur-md">
         <div className="!flex !items-center !gap-12 !h-full">
           <div 
@@ -140,17 +142,14 @@ export default function ModelosPage() {
           
           <div className="!hidden md:!flex !items-center !gap-8 !text-[15px] !font-bold !text-gray-600 !h-full">
             
-            {/* === INÍCIO DO MENU DE PRODUTOS === */}
             <div className="!relative group !h-full !flex !items-center">
               <button className="hover:!text-black !transition-colors !h-full !flex !items-center !gap-1">
                 Produtos
                 <svg className="!w-4 !h-4 !transition-transform group-hover:!rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
 
-              {/* MEGA MENU DROPDOWN */}
               <div className="!absolute !top-[80px] !-left-12 lg:!-left-24 !w-[850px] !bg-white !rounded-3xl !shadow-[0_20px_60px_rgba(0,0,0,0.1)] !border !border-gray-100 !opacity-0 !invisible group-hover:!opacity-100 group-hover:!visible !transition-all !duration-200 !flex !overflow-hidden !z-50 !cursor-default">
                 
-                {/* Coluna 1: Categorias Laterais */}
                 <div className="!w-[32%] !bg-[#F9FAFB] !p-4 !flex !flex-col !gap-2 !border-r !border-gray-100">
                   <div className="!flex !items-center !justify-between !px-4 !py-3.5 !bg-white !rounded-2xl !shadow-sm !font-bold !text-black !text-[14px] !cursor-pointer">
                     <div className="!flex !items-center !gap-3">
@@ -193,7 +192,6 @@ export default function ModelosPage() {
                   </div>
                 </div>
 
-                {/* Coluna 2: Detalhes das Ferramentas */}
                 <div className="!w-[43%] !p-8 !flex !flex-col !gap-7">
                   <div className="group/item !cursor-pointer">
                     <h4 className="!text-black !font-bold !text-[15px] group-hover/item:!text-sky-500 !transition-colors">Link na bio</h4>
@@ -216,28 +214,11 @@ export default function ModelosPage() {
                   <div>
                     <h4 className="!text-black !font-bold !text-[15px]">Integrações sociais</h4>
                     <p className="!text-gray-500 !text-[13px] !mt-1.5 !leading-relaxed !mb-3">Expanda e envolva seu público unindo todas as suas redes sociais.</p>
-                    <div className="!flex !gap-3 !text-gray-400">
-                      <div className="!w-8 !h-8 !bg-gray-100 !rounded-full !flex !items-center !justify-center hover:!text-black hover:!bg-gray-200 !transition-colors !cursor-pointer">
-                        <svg className="!w-4 !h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                      </div>
-                      <div className="!w-8 !h-8 !bg-gray-100 !rounded-full !flex !items-center !justify-center hover:!text-black hover:!bg-gray-200 !transition-colors !cursor-pointer">
-                        <svg className="!w-4 !h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                      </div>
-                      <div className="!w-8 !h-8 !bg-gray-100 !rounded-full !flex !items-center !justify-center hover:!text-black hover:!bg-gray-200 !transition-colors !cursor-pointer">
-                        <svg className="!w-4 !h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                      </div>
-                      <div className="!w-8 !h-8 !bg-gray-100 !rounded-full !flex !items-center !justify-center hover:!text-black hover:!bg-gray-200 !transition-colors !cursor-pointer">
-                        <svg className="!w-4 !h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                {/* Coluna 3: Destaque Lateral */}
                 <div className="!w-[25%] !bg-[#F9FAFB] !border-l !border-gray-100 !p-6 !flex !flex-col">
                   <h3 className="!text-black !text-[15px] !font-bold !mb-4">Em destaque</h3>
-                  
-                  {/* Card Ilustrativo Destaque */}
                   <div className="!w-full !aspect-square !bg-gradient-to-br !from-indigo-600 !to-[#8129D9] !rounded-2xl !mb-4 !p-4 !flex !flex-col !justify-end !relative !overflow-hidden">
                     <div className="!absolute !-right-4 !-top-4 !w-24 !h-24 !bg-white/10 !rounded-full !blur-xl"></div>
                     <div className="!w-10 !h-10 !bg-white !rounded-full !border-2 !border-white !mb-2 !shadow-lg">
@@ -246,7 +227,6 @@ export default function ModelosPage() {
                     <div className="!w-2/3 !h-2 !bg-white/80 !rounded-full !mb-1.5"></div>
                     <div className="!w-1/2 !h-2 !bg-white/50 !rounded-full"></div>
                   </div>
-
                   <p className="!text-gray-600 !text-[13px] !leading-relaxed">
                     Junte-se a milhares de usuários do BioFlow. Um único link para compartilhar tudo o que você cria, e vender em todas as suas redes.
                   </p>
@@ -254,7 +234,6 @@ export default function ModelosPage() {
 
               </div>
             </div>
-            {/* === FIM DO MENU DE PRODUTOS === */}
 
             <button className="!text-black !border-b-2 !border-black !py-1 !h-max">Modelos</button>
             <button onClick={() => router.push("/pricing")} className="hover:!text-black !transition-colors !h-full !flex !items-center">Planos</button>
@@ -270,7 +249,7 @@ export default function ModelosPage() {
               <button onClick={() => router.push("/login")} className="!text-[15px] !font-bold !bg-gray-200 hover:!bg-gray-300 !text-black !px-6 !py-3 !rounded-full !transition-colors !hidden sm:!block">
                 Entrar
               </button>
-              <button onClick={() => router.push("/register")} className="!text-[15px] !font-bold !bg-black hover:!bg-gray-800 !text-white !px-6 !py-3 !rounded-full !transition-colors">
+              <button onClick={() => router.push("/login")} className="!text-[15px] !font-bold !bg-black hover:!bg-gray-800 !text-white !px-6 !py-3 !rounded-full !transition-colors">
                 Criar meu BioFlow
               </button>
             </>
@@ -278,14 +257,12 @@ export default function ModelosPage() {
         </div>
       </nav>
 
-      {/* ÁREA DO CONTEÚDO (Transição Suave) */}
+      {/* ÁREA DO CONTEÚDO */}
       {isLoading ? (
-        // Se estiver carregando, mostra o spinner na área abaixo do menu
         <div className="!flex !items-center !justify-center !h-[calc(100vh-96px)]">
           <div className="!animate-spin !rounded-full !h-12 !w-12 !border-t-2 !border-b-2 !border-sky-500"></div>
         </div>
       ) : (
-        // Se já carregou, aplica a classe de fade-in
         <div className={`!transition-opacity !duration-700 !ease-out ${isVisible ? '!opacity-100' : '!opacity-0'}`}>
           <main className="!max-w-7xl !mx-auto !px-6 lg:!px-12 !py-16 !text-center">
             <h1 className="!text-5xl sm:!text-6xl !font-black !tracking-tight !mb-6 !text-gray-900">
@@ -295,7 +272,6 @@ export default function ModelosPage() {
               Diferentes estilos visuais para ajudar você a criar um perfil que reflita a sua marca. Escolha um e comece agora mesmo!
             </p>
 
-            {/* GALERIA DE TEMPLATES */}
             <div className="!mt-16 !grid !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-4 !gap-8 !pb-20">
               {templates.map((tpl) => (
                 <div 
@@ -368,25 +344,27 @@ export default function ModelosPage() {
               </button>
             </div>
 
-            <div className="!flex-1 !bg-white !border-l !border-gray-200 !flex !items-center !justify-center !p-8 md:!p-0 !min-h-[500px]">
-              <div className="!w-full !max-w-[320px] !h-[640px] !bg-black !rounded-[48px] !p-3 !shadow-2xl !relative !overflow-hidden">
-                <div className="!absolute !top-0 !inset-x-0 !h-6 !w-36 !bg-black !mx-auto !rounded-b-2xl !z-20"></div>
-                <div className={`!w-full !h-full !rounded-[36px] !relative !overflow-hidden !flex !flex-col !items-center !pt-16 !px-5 ${selectedTemplate.bgClass}`}>
-                  <div className="!w-24 !h-24 !rounded-full !bg-white/20 !backdrop-blur-md !p-1 !mb-5">
+            {/* 👇 LADO DIREITO DO MODAL (O CELULAR) - TAMANHO FIXO PARA NÃO QUEBRAR 👇 */}
+            <div className="!hidden md:!flex !flex-1 !bg-white !border-l !border-gray-200 !items-center !justify-center !p-8 !relative">
+              <div className="!w-[280px] !h-[580px] !bg-black !rounded-[40px] !p-2 !shadow-2xl !relative !overflow-hidden !shrink-0">
+                <div className="!absolute !top-0 !inset-x-0 !h-5 !w-28 !bg-black !mx-auto !rounded-b-xl !z-20"></div>
+                <div className={`!w-full !h-full !rounded-[32px] !relative !overflow-hidden !flex !flex-col !items-center !pt-14 !px-4 ${selectedTemplate.bgClass}`}>
+                  <div className="!w-20 !h-20 !rounded-full !bg-white/20 !backdrop-blur-md !p-1 !mb-4">
                      <img src={`https://ui-avatars.com/api/?name=${selectedTemplate.name}&background=random`} alt="avatar" className="!w-full !h-full !rounded-full !object-cover" />
                   </div>
-                  <h3 className={`!text-xl !font-bold !mb-2 ${selectedTemplate.textClass}`}>{selectedTemplate.name}</h3>
-                  <p className={`!text-sm !font-medium !mb-10 !text-center !opacity-80 ${selectedTemplate.textClass}`}>
+                  <h3 className={`!text-lg !font-bold !mb-1 !text-center ${selectedTemplate.textClass}`}>{selectedTemplate.name}</h3>
+                  <p className={`!text-xs !font-medium !mb-6 !text-center !opacity-80 !leading-relaxed ${selectedTemplate.textClass}`}>
                     Exemplo de biografia para o modelo {selectedTemplate.name}.
                   </p>
-                  <div className="!w-full !flex !flex-col !gap-4">
-                    <div className={`!w-full !h-14 !rounded-[16px] !flex !items-center !justify-center !font-bold !text-[15px] ${selectedTemplate.btnClass}`}>Meu Portfólio</div>
-                    <div className={`!w-full !h-14 !rounded-[16px] !flex !items-center !justify-center !font-bold !text-[15px] ${selectedTemplate.btnClass}`}>Loja Oficial</div>
-                    <div className={`!w-full !h-14 !rounded-[16px] !flex !items-center !justify-center !font-bold !text-[15px] ${selectedTemplate.btnClass}`}>Inscreva-se no Canal</div>
+                  <div className="!w-full !flex !flex-col !gap-3">
+                    <div className={`!w-full !h-12 !rounded-[14px] !flex !items-center !justify-center !font-bold !text-[13px] ${selectedTemplate.btnClass}`}>Meu Portfólio</div>
+                    <div className={`!w-full !h-12 !rounded-[14px] !flex !items-center !justify-center !font-bold !text-[13px] ${selectedTemplate.btnClass}`}>Loja Oficial</div>
+                    <div className={`!w-full !h-12 !rounded-[14px] !flex !items-center !justify-center !font-bold !text-[13px] ${selectedTemplate.btnClass}`}>Inscreva-se no Canal</div>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
