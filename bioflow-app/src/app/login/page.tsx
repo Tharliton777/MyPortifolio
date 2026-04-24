@@ -159,7 +159,6 @@ function LoginContent() {
                   className="!w-full !h-14 !px-6 !bg-[#F6F7F5] !border !border-transparent focus:!bg-white !rounded-2xl !text-black placeholder:!text-gray-500 focus:!outline-none focus:!border-black focus:!ring-1 focus:!ring-black !transition-all !text-base !font-medium"
                 />
                 
-                {/* === NOVO: LINK DE ESQUECEU A SENHA AQUI === */}
                 <div className="!flex !justify-end !px-1">
                   <Link 
                     href="/forgot-password" 
@@ -190,7 +189,7 @@ function LoginContent() {
 
             <div className="!mt-8 !text-center !px-4">
                <p className="!text-xs !text-gray-500 !leading-relaxed !font-medium">
-                 Ao clicar em <strong>Criar conta</strong>, você concorda com o <a href="#" className="!underline hover:!text-black !transition-colors">aviso de privacidade</a>, <a href="#" className="!underline hover:!text-black !transition-colors">Termos e Condições</a> e <a href="#" className="!underline hover:!text-black !transition-colors">aviso de cookies</a>.
+                 Ao clicar em <strong>Criar conta</strong>, você concorda com o <Link href="/privacidade" className="!underline hover:!text-black !transition-colors">aviso de privacidade</Link>, <Link href="/termos" className="!underline hover:!text-black !transition-colors">Termos e Condições</Link> e <Link href="/privacidade" className="!underline hover:!text-black !transition-colors">aviso de cookies</Link>.
                </p>
             </div>
 
