@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabase } from "../../lib/supabase";
-import Link from "next/link"; // <-- IMPORT AQUI
+import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +58,6 @@ export default async function PublicProfilePage({ params }: Props) {
     .eq("username", username)
     .single();
 
-  // Tratamento se o perfil não existir
   if (!profile || profileError) {
     return (
       <div className="min-h-screen bg-[#F3F4F6] text-black p-10 flex flex-col items-center justify-center font-sans">
@@ -200,8 +199,9 @@ export default async function PublicProfilePage({ params }: Props) {
       {/* OVERLAY SUTIL */}
       <div className={`absolute inset-0 z-0 backdrop-blur-[100px] ${darkTextNeeded ? 'bg-black/10' : 'bg-white/40'}`}></div>
 
+      {/* 👇 CORRIGIDO: Adicionado !pb-40 para garantir margem de respiro no fim do ecrã! 👇 */}
       <div 
-        className={`w-full h-full sm:h-auto sm:min-h-[850px] max-w-[640px] sm:rounded-[40px] sm:shadow-[0_20px_60px_rgba(0,0,0,0.2)] relative flex flex-col overflow-hidden z-10 transition-all !pb-12 ${getThemeBackgroundClass()}`}
+        className={`w-full h-full sm:h-auto sm:min-h-[850px] max-w-[640px] sm:rounded-[40px] sm:shadow-[0_20px_60px_rgba(0,0,0,0.2)] relative flex flex-col overflow-hidden z-10 transition-all !pb-40 ${getThemeBackgroundClass()}`}
         style={getDynamicStyle()}
       >
         
@@ -233,7 +233,7 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
           )}
 
-          {/* NOME (MENOS GROSSEIRO, APENAS FONT-BOLD) */}
+          {/* NOME */}
           <h1 className={`text-[24px] sm:text-[26px] font-bold flex items-center justify-center gap-1.5 ${profile.avatar_url ? '!mt-6' : (profile.cover_url ? '!mt-12' : '!mt-28')} !mb-2 tracking-tight text-center ${darkTextNeeded ? "text-white" : "text-[#111827]"}`}>
             {profile.display_name || profile.username}
             {profile.is_verified && (
@@ -249,7 +249,7 @@ export default async function PublicProfilePage({ params }: Props) {
 
           {/* LISTA DE LINKS */}
           <div className="w-full max-w-[600px] flex flex-col gap-4">
-            {links?.map((link) => (
+            {links?.map((link: any) => (
               <div key={link.id} className="relative w-full">
                 
                 <a 
@@ -272,10 +272,11 @@ export default async function PublicProfilePage({ params }: Props) {
           </div>
         </div>
 
-        <div className="w-full flex flex-col items-center pt-16 mt-auto z-20 gap-6">
+        {/* 👇 CORRIGIDO: Footer com a Marca e Links de Privacidade fixos no fundo absoluto 👇 */}
+        <div className="absolute bottom-8 inset-x-0 w-full flex flex-col items-center z-20 gap-4 pointer-events-none">
           <a 
             href="/login" 
-            className={`!inline-flex !items-center !justify-center !gap-2 !px-8 !py-4 !rounded-full !font-bold text-[16px] !shadow-lg hover:!shadow-2xl !transition-shadow !duration-300 !backdrop-blur-md ${darkTextNeeded ? "!bg-black/40 !text-white !border !border-white/10" : "!bg-white !text-black"}`}
+            className={`pointer-events-auto !inline-flex !items-center !justify-center !gap-2 !px-8 !py-4 !rounded-full !font-bold text-[16px] !shadow-lg hover:!shadow-2xl !transition-shadow !duration-300 !backdrop-blur-md ${darkTextNeeded ? "!bg-black/40 !text-white !border !border-white/10" : "!bg-white/90 !text-black"}`}
           >
             <svg className="w-5 h-5 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
@@ -284,16 +285,12 @@ export default async function PublicProfilePage({ params }: Props) {
             Junte-se a {firstName} no BioFlow
           </a>
 
-          {/* === AQUI ESTÁ A ATUALIZAÇÃO DOS LINKS DO RODAPÉ === */}
-          <div className={`flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] font-semibold opacity-70 px-4 !mb-8 ${darkTextNeeded ? "text-white" : "text-[#111827]"}`}>
-            {/* AGORA ABRE O MODAL DE COOKIES EM VEZ DE SÓ UM LINK VAZIO */}
+          <div className={`pointer-events-auto flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] font-semibold opacity-70 px-4 ${darkTextNeeded ? "text-white" : "text-[#111827]"}`}>
             <label htmlFor="cookie-toggle" className="cursor-pointer hover:underline text-inherit no-underline">Preferências de cookies</label>
             <Link href="/report" className="cursor-pointer hover:underline text-inherit no-underline">Relatório</Link>
             <Link href="/privacidade" className="cursor-pointer hover:underline text-inherit no-underline">Privacidade</Link>
             <Link href="/" className="cursor-pointer hover:underline text-inherit no-underline">Explorar</Link>
           </div>
-          {/* ==================================================== */}
-
         </div>
 
       </div>
@@ -460,7 +457,7 @@ export default async function PublicProfilePage({ params }: Props) {
       {/* ========================================== */}
       {/* RENDERIZAÇÃO DOS MODAIS ESPECÍFICOS DE CADA LINK */}
       {/* ========================================== */}
-      {links?.map((link) => {
+      {links?.map((link: any) => {
         const linkImage = (link as any).image_url || null;
         const linkDesc = (link as any).description || null;
 

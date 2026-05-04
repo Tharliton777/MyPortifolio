@@ -10,7 +10,7 @@ interface LinkItem {
   url: string;
   is_active: boolean;
   position: number;
-  image_url?: string; // Adicionado para receber a imagem do link
+  image_url?: string;
 }
 
 function DashboardContent() {
@@ -51,8 +51,8 @@ function DashboardContent() {
   const [editingLink, setEditingLink] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editUrl, setEditUrl] = useState("");
-  const [editImageUrl, setEditImageUrl] = useState(""); // Novo estado
-  const [uploadingLinkImage, setUploadingLinkImage] = useState(false); // Novo estado
+  const [editImageUrl, setEditImageUrl] = useState(""); 
+  const [uploadingLinkImage, setUploadingLinkImage] = useState(false); 
 
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -94,19 +94,11 @@ function DashboardContent() {
       return;
     }
 
-    // ==========================================
-    // CAPTURA DE TEMA VIA URL (NOVO)
-    // ==========================================
     const themeParam = searchParams.get("theme");
 
     if (themeParam) {
-      // Atualiza o banco de dados imediatamente com o tema escolhido na vitrine
       await supabase.from("profiles").update({ theme: themeParam }).eq("id", user.id);
-      
-      // Muda a aba ativa para a pessoa já ver o preview na hora
       setActiveTab("appearance");
-      
-      // Limpa a URL silenciosamente (tira o ?theme=)
       router.replace("/dashboard");
     }
 
@@ -124,10 +116,8 @@ function DashboardContent() {
         ? profileData.username.toLowerCase().replace(/[^a-z0-9_.-]/g, "")
         : "";
 
-      // Decide qual tema usar (o que acabou de vir da URL ou o que já estava no banco)
       const appliedTheme = themeParam || profileData.theme;
 
-      // Salvamos no estado do React já com o tema correto aplicado
       setProfile({ ...profileData, username: safeUsername, theme: appliedTheme });
       setEditUsername(safeUsername);
       setEditDisplayName(profileData.display_name || "");
@@ -410,7 +400,6 @@ function DashboardContent() {
     setSavingLink(false);
   };
 
-  // INÍCIO DA EDIÇÃO
   const startEditing = (link: LinkItem) => {
     setEditingLink(link.id);
     setEditTitle(link.title);
@@ -425,7 +414,6 @@ function DashboardContent() {
     setEditImageUrl("");
   };
 
-  // UPLOAD DA IMAGEM DO LINK (NOVO)
   const handleLinkImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploadingLinkImage(true);
@@ -441,7 +429,7 @@ function DashboardContent() {
       const filePath = `${user.id}-link-${Math.random()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("link_images") // IMPORTANTE: O Bucket "link_images" deve existir no Supabase!
+        .from("link_images")
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
@@ -450,7 +438,7 @@ function DashboardContent() {
 
       setEditImageUrl(publicUrl);
     } catch (error) {
-      setErrorMsg("Erro ao fazer upload da imagem do link. Verifique se o bucket 'link_images' existe.");
+      setErrorMsg("Erro ao fazer upload da imagem do link.");
     } finally {
       setUploadingLinkImage(false);
     }
@@ -641,13 +629,13 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* NAVEGAÇÃO SUPERIOR */}
-      <nav className="!w-full !bg-white border-b border-gray-200 !sticky !top-0 !z-50 !h-20 !flex !items-center !justify-between !px-6 lg:!px-10">
-        <div className="!flex !items-center !gap-8 !h-full">
-          <div className="!flex !items-center !gap-2 !cursor-pointer !font-bold !text-2xl !tracking-tight">
+      {/* NAVEGAÇÃO SUPERIOR RESPONSIVA */}
+      <nav className="!w-full !bg-white border-b border-gray-200 !sticky !top-0 !z-50 !h-20 !flex !items-center !justify-between !px-4 md:!px-10">
+        <div className="!flex !items-center !gap-6 !h-full !overflow-x-auto hide-scrollbar">
+          <div className="!flex !items-center !gap-2 !cursor-pointer !font-bold !text-xl md:!text-2xl !tracking-tight !shrink-0">
             BioFlow
             <svg
-              className="!w-6 !h-6 !mt-0.5 !text-sky-500"
+              className="!w-5 !h-5 md:!w-6 md:!h-6 !mt-0.5 !text-sky-500"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -659,7 +647,7 @@ function DashboardContent() {
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
             </svg>
           </div>
-          <div className="!hidden md:!flex !items-center !gap-6 !text-[15px] !font-semibold !text-gray-500 !h-full">
+          <div className="!flex !items-center !gap-4 md:!gap-6 !text-[14px] md:!text-[15px] !font-semibold !text-gray-500 !h-full !shrink-0">
             <button
               onClick={() => setActiveTab("links")}
               className={`!h-full !px-1 !pt-1 border-b-2 transition-colors ${
@@ -694,49 +682,33 @@ function DashboardContent() {
         </div>
         <button
           onClick={handleLogout}
-          className="!text-[15px] !font-semibold !bg-gray-100 hover:!bg-gray-200 !text-black !px-5 !py-2.5 !rounded-full !transition-colors"
+          className="!text-[14px] md:!text-[15px] !font-semibold !bg-gray-100 hover:!bg-gray-200 !text-black !px-4 md:!px-5 !py-2 md:!py-2.5 !rounded-full !transition-colors !shrink-0 !ml-2"
         >
           Sair
         </button>
       </nav>
 
-      {/* ÁREA DE TRABALHO PRINCIPAL */}
-      <div className="!flex-1 !w-full !max-w-[1200px] !mx-auto !flex !flex-col md:!flex-row !p-6 lg:!p-10 !gap-10 !items-start">
+      {/* 👇 CORRIGIDO: !flex-col no mobile garante que os formulários aparecem em cima, e o telemóvel fica por baixo! 👇 */}
+      <div className="!flex-1 !w-full !max-w-[1200px] !mx-auto !flex !flex-col lg:!flex-row !p-4 md:!p-6 lg:!p-10 !gap-8 lg:!gap-10 !items-start">
         
         {/* ==================================================== */}
         {/* LADO ESQUERDO (CONTEÚDO DINÂMICO DAS ABAS)             */}
         {/* ==================================================== */}
-        <div className="!flex-1 !min-w-0 !flex !flex-col !gap-6">
+        <div className="!w-full lg:!flex-1 !flex !flex-col !gap-6">
           
           {/* MENSAGENS DE SUCESSO/ERRO GLOBAIS */}
           {errorMsg && (
-            <div className="!w-full !bg-red-50 border border-red-200 !text-red-600 !px-4 !py-3 !rounded-xl !flex !items-center !gap-3 !text-[15px] !font-medium">
-              <svg
-                className="!w-5 !h-5 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
+            <div className="!w-full !bg-red-50 border border-red-200 !text-red-600 !px-4 !py-3 !rounded-xl !flex !items-center !gap-3 !text-[14px] md:!text-[15px] !font-medium">
+              <svg className="!w-5 !h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
               </svg>
               {errorMsg}
             </div>
           )}
           {successMsg && (
-            <div className="!w-full !bg-emerald-50 border border-emerald-200 !text-emerald-600 !px-4 !py-3 !rounded-xl !flex !items-center !gap-3 !text-[15px] !font-medium">
-              <svg
-                className="!w-5 !h-5 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM13.707 5.293a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8 10.586l4.293-4.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
+            <div className="!w-full !bg-emerald-50 border border-emerald-200 !text-emerald-600 !px-4 !py-3 !rounded-xl !flex !items-center !gap-3 !text-[14px] md:!text-[15px] !font-medium">
+              <svg className="!w-5 !h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM13.707 5.293a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8 10.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd"/>
               </svg>
               {successMsg}
             </div>
@@ -746,35 +718,25 @@ function DashboardContent() {
           {/* ABA: LINKS                                 */}
           {/* ========================================== */}
           {activeTab === "links" && (
-            <div className="!bg-white !p-8 !rounded-3xl border border-gray-200 shadow-sm">
-              <h2 className="!text-[28px] !font-bold !text-black !mb-6 !font-sans">
+            <div className="!bg-white !p-6 md:!p-8 !rounded-3xl border border-gray-200 shadow-sm">
+              <h2 className="!text-[24px] md:!text-[28px] !font-bold !text-black !mb-6 !font-sans">
                 Adicionar Links
               </h2>
               
               {!isAdding ? (
                 <button
                   onClick={() => setIsAdding(true)}
-                  className="!w-full !py-4 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !text-[16px] !rounded-full !transition-colors !flex !items-center !justify-center !gap-2 !font-sans"
+                  className="!w-full !py-4 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !text-[15px] md:!text-[16px] !rounded-full !transition-colors !flex !items-center !justify-center !gap-2 !font-sans"
                 >
-                  <svg
-                    className="!w-5 !h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 4v16m8-8H4"
-                    ></path>
+                  <svg className="!w-5 !h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
                   </svg>
                   Adicionar Novo Link
                 </button>
               ) : (
                 <form
                   onSubmit={handleSaveLink}
-                  className="!w-full !bg-gray-50 !p-6 !rounded-2xl border border-gray-200 !flex !flex-col !gap-4"
+                  className="!w-full !bg-gray-50 !p-5 md:!p-6 !rounded-2xl border border-gray-200 !flex !flex-col !gap-4"
                 >
                   <input
                     type="text"
@@ -782,7 +744,7 @@ function DashboardContent() {
                     required
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[16px]"
+                    className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[15px] md:!text-[16px]"
                   />
                   <input
                     type="url"
@@ -790,20 +752,20 @@ function DashboardContent() {
                     required
                     value={newUrl}
                     onChange={(e) => setNewUrl(e.target.value.replace(/\s+/g, ''))}
-                    className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[16px]"
+                    className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[15px] md:!text-[16px]"
                   />
                   <div className="!flex !justify-end !gap-3 !mt-2">
                     <button
                       type="button"
                       onClick={() => setIsAdding(false)}
-                      className="!px-6 !py-2.5 !bg-gray-200 hover:!bg-gray-300 !text-black !font-bold !text-[15px] !rounded-full !transition-colors"
+                      className="!px-5 md:!px-6 !py-2 md:!py-2.5 !bg-gray-200 hover:!bg-gray-300 !text-black !font-bold !text-[14px] md:!text-[15px] !rounded-full !transition-colors"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={savingLink}
-                      className="!px-6 !py-2.5 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !text-[15px] !rounded-full !transition-colors disabled:opacity-50"
+                      className="!px-5 md:!px-6 !py-2 md:!py-2.5 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !text-[14px] md:!text-[15px] !rounded-full !transition-colors disabled:opacity-50"
                     >
                       {savingLink ? "Salvando..." : "Salvar Link"}
                     </button>
@@ -813,8 +775,8 @@ function DashboardContent() {
 
               <div className="!mt-8 !flex !flex-col !gap-4">
                 {links.length === 0 ? (
-                  <div className="!text-center !bg-gray-50 !rounded-2xl !p-10 border border-dashed border-gray-300">
-                    <p className="!text-gray-500 !mt-2 !text-[15px] !font-sans">
+                  <div className="!text-center !bg-gray-50 !rounded-2xl !p-8 md:!p-10 border border-dashed border-gray-300">
+                    <p className="!text-gray-500 !mt-2 !text-[14px] md:!text-[15px] !font-sans">
                       Adicione seu primeiro link para exibi-lo no seu perfil BioFlow.
                     </p>
                   </div>
@@ -824,25 +786,24 @@ function DashboardContent() {
                       <form
                         key={link.id}
                         onSubmit={(e) => handleUpdateLink(e, link.id)}
-                        className="!w-full !bg-white !p-6 !rounded-2xl border-2 border-sky-500 shadow-md !flex !flex-col !gap-4 !transition-all"
+                        className="!w-full !bg-white !p-5 md:!p-6 !rounded-2xl border-2 border-sky-500 shadow-md !flex !flex-col !gap-4 !transition-all"
                       >
                         <input
                           type="text"
                           required
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[16px]"
+                          className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[15px] md:!text-[16px]"
                         />
                         <input
                           type="url"
                           required
                           value={editUrl}
                           onChange={(e) => setEditUrl(e.target.value.replace(/\s+/g, ''))}
-                          className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[16px]"
+                          className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 !text-[15px] md:!text-[16px]"
                         />
                         
-                        {/* ÁREA DE UPLOAD DA IMAGEM DO LINK */}
-                        <div className="!flex !items-center !gap-4 !mt-2 !p-3 !bg-gray-50 !rounded-xl !border !border-gray-200">
+                        <div className="!flex !flex-col md:!flex-row !items-start md:!items-center !gap-4 !mt-2 !p-3 !bg-gray-50 !rounded-xl !border !border-gray-200">
                           <div className="!w-14 !h-14 !bg-gray-200 !rounded-xl !overflow-hidden !flex !items-center !justify-center !shrink-0 !border !border-gray-300">
                             {editImageUrl ? (
                               <img src={editImageUrl} alt="Imagem do Link" className="!w-full !h-full !object-cover" />
@@ -850,14 +811,14 @@ function DashboardContent() {
                               <svg className="!w-6 !h-6 !text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
                             )}
                           </div>
-                          <div className="!flex !flex-col !gap-1.5 !flex-1">
-                            <span className="!text-[14px] !font-bold !text-gray-700">Imagem ou Ícone do Link</span>
-                            <div className="!flex !gap-2 !items-center">
+                          <div className="!flex !flex-col !gap-1.5 !flex-1 !w-full">
+                            <span className="!text-[13px] md:!text-[14px] !font-bold !text-gray-700">Imagem ou Ícone</span>
+                            <div className="!flex !flex-wrap !gap-2 !items-center">
                               <button
                                 type="button"
                                 onClick={() => document.getElementById(`link-image-upload-${link.id}`)?.click()}
                                 disabled={uploadingLinkImage}
-                                className="!text-[13px] !bg-white border border-gray-300 hover:!bg-gray-50 !text-black !font-bold !px-3 !py-1.5 !rounded-lg !transition-colors"
+                                className="!text-[12px] md:!text-[13px] !bg-white border border-gray-300 hover:!bg-gray-50 !text-black !font-bold !px-3 !py-1.5 !rounded-lg !transition-colors"
                               >
                                 {uploadingLinkImage ? "Enviando..." : "Definir Imagem"}
                               </button>
@@ -865,7 +826,7 @@ function DashboardContent() {
                                 <button
                                   type="button"
                                   onClick={() => setEditImageUrl("")}
-                                  className="!text-[13px] !bg-red-50 hover:!bg-red-100 !text-red-500 !font-bold !px-3 !py-1.5 !rounded-lg !transition-colors"
+                                  className="!text-[12px] md:!text-[13px] !bg-red-50 hover:!bg-red-100 !text-red-500 !font-bold !px-3 !py-1.5 !rounded-lg !transition-colors"
                                 >
                                   Remover
                                 </button>
@@ -885,13 +846,13 @@ function DashboardContent() {
                           <button
                             type="button"
                             onClick={cancelEditing}
-                            className="!px-6 !py-2.5 !bg-gray-100 hover:!bg-gray-200 !text-black !font-bold !text-[15px] !rounded-full !transition-colors"
+                            className="!px-5 md:!px-6 !py-2 md:!py-2.5 !bg-gray-100 hover:!bg-gray-200 !text-black !font-bold !text-[14px] md:!text-[15px] !rounded-full !transition-colors"
                           >
                             Cancelar
                           </button>
                           <button
                             type="submit"
-                            className="!px-6 !py-2.5 !bg-black hover:!bg-gray-800 !text-white !font-bold !text-[15px] !rounded-full !transition-colors"
+                            className="!px-5 md:!px-6 !py-2 md:!py-2.5 !bg-black hover:!bg-gray-800 !text-white !font-bold !text-[14px] md:!text-[15px] !rounded-full !transition-colors"
                           >
                             Atualizar
                           </button>
@@ -905,93 +866,69 @@ function DashboardContent() {
                         onDragEnter={() => (dragOverItem.current = index)}
                         onDragEnd={handleSort}
                         onDragOver={(e) => e.preventDefault()}
-                        className="!w-full !bg-white !p-5 !rounded-2xl border border-gray-200 shadow-sm !flex !items-center !justify-between hover:shadow-md !transition-all active:!scale-[0.99] active:!shadow-inner !bg-opacity-95"
+                        className="!w-full !bg-white !p-4 md:!p-5 !rounded-2xl border border-gray-200 shadow-sm !flex !items-center !justify-between hover:shadow-md !transition-all active:!scale-[0.99] active:!shadow-inner !bg-opacity-95"
                       >
-                        <div className="!flex !items-center !truncate !mr-4 !w-full">
-                          <div className="!text-gray-300 !cursor-grab active:!cursor-grabbing hover:!text-gray-500 !mr-4 !shrink-0">
-                            <svg
-                              className="!w-6 !h-6"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
+                        <div className="!flex !items-center !truncate !mr-2 md:!mr-4 !w-full">
+                          <div className="!text-gray-300 !cursor-grab active:!cursor-grabbing hover:!text-gray-500 !mr-2 md:!mr-4 !shrink-0">
+                            <svg className="!w-5 !h-5 md:!w-6 md:!h-6" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M9 5a2 2 0 11-4 0 2 2 0 014 0zM9 12a2 2 0 11-4 0 2 2 0 014 0zM9 19a2 2 0 11-4 0 2 2 0 014 0zM19 5a2 2 0 11-4 0 2 2 0 014 0zM19 12a2 2 0 11-4 0 2 2 0 014 0zM19 19a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                           </div>
                           
-                          {/* MINIATURA DA IMAGEM NA LISTA */}
                           {link.image_url ? (
-                            <img src={link.image_url} alt={link.title} className="!w-[42px] !h-[42px] !rounded-lg !object-cover !mr-4 !shrink-0 !border !border-gray-200" />
+                            <img src={link.image_url} alt={link.title} className="!w-[36px] !h-[36px] md:!w-[42px] md:!h-[42px] !rounded-lg !object-cover !mr-3 md:!mr-4 !shrink-0 !border !border-gray-200" />
                           ) : (
-                            <div className="!w-[42px] !h-[42px] !rounded-lg !bg-gray-50 !border !border-gray-200 !flex !items-center !justify-center !mr-4 !shrink-0">
-                               <svg className="!w-5 !h-5 !text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
+                            <div className="!w-[36px] !h-[36px] md:!w-[42px] md:!h-[42px] !rounded-lg !bg-gray-50 !border !border-gray-200 !flex !items-center !justify-center !mr-3 md:!mr-4 !shrink-0">
+                               <svg className="!w-4 !h-4 md:!w-5 md:!h-5 !text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
                             </div>
                           )}
 
                           <div className="!flex !flex-col !truncate">
-                            <span className="!font-bold !text-[16px] !text-gray-900 !truncate">
+                            <span className="!font-bold !text-[15px] md:!text-[16px] !text-gray-900 !truncate">
                               {link.title}
                             </span>
-                            <span className="!text-[14px] !text-gray-500 !truncate">
+                            <span className="!text-[13px] md:!text-[14px] !text-gray-500 !truncate">
                               {link.url}
                             </span>
                           </div>
                         </div>
-                        <div className="!flex !items-center !gap-2 sm:!gap-4 !shrink-0">
+                        
+                        <div className="!flex !items-center !gap-1 sm:!gap-2 !shrink-0">
                           <button
                             onClick={() => startEditing(link)}
-                            className="!p-2 !text-gray-400 hover:!text-sky-500 !transition-colors !rounded-lg hover:!bg-sky-50"
+                            className="!p-1.5 md:!p-2 !text-gray-400 hover:!text-sky-500 !transition-colors !rounded-lg hover:!bg-sky-50"
                           >
-                            <svg
-                              className="!w-5 !h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                              ></path>
+                            <svg className="!w-4 !h-4 md:!w-5 md:!h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                             </svg>
                           </button>
 
                           <div
                             onClick={() => toggleLinkStatus(link.id, link.is_active)}
-                            className={`!w-12 !h-6 !rounded-full !p-1 !transition-colors !cursor-pointer ${
+                            className={`!w-10 md:!w-12 !h-5 md:!h-6 !rounded-full !p-0.5 md:!p-1 !transition-colors !cursor-pointer ${
                               link.is_active ? "!bg-green-500" : "!bg-gray-300"
                             }`}
                           >
                             <div
                               className={`!w-4 !h-4 !bg-white !rounded-full !transition-transform ${
-                                link.is_active ? "!translate-x-6" : "!translate-x-0"
+                                link.is_active ? "!translate-x-5 md:!translate-x-6" : "!translate-x-0"
                               }`}
                             ></div>
                           </div>
 
                           <button
                             onClick={() => setLinkToDelete(link.id)}
-                            className="!p-2 !text-gray-400 hover:!text-red-500 !transition-colors !rounded-lg hover:!bg-red-50"
+                            className="!p-1.5 md:!p-2 !text-gray-400 hover:!text-red-500 !transition-colors !rounded-lg hover:!bg-red-50"
                           >
-                            <svg
-                              className="!w-5 !h-5"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              ></path>
+                            <svg className="!w-4 !h-4 md:!w-5 md:!h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
                           </button>
                         </div>
                       </div>
                     )
                    )
-                  )}
+                 )}
               </div>
             </div>
           )}
@@ -1000,11 +937,10 @@ function DashboardContent() {
           {/* ABA: APARÊNCIA                             */}
           {/* ========================================== */}
           {activeTab === "appearance" && (
-            <div className="!bg-white !p-8 !rounded-3xl border border-gray-200 shadow-sm !flex !flex-col !gap-10">
+            <div className="!bg-white !p-6 md:!p-8 !rounded-3xl border border-gray-200 shadow-sm !flex !flex-col !gap-10">
               
-              {/* SESSÃO: PERFIL E CAPA */}
               <div>
-                <h2 className="!text-[28px] !font-bold !text-black !font-sans !mb-6">
+                <h2 className="!text-[24px] md:!text-[28px] !font-bold !text-black !font-sans !mb-6">
                   Perfil
                 </h2>
                 
@@ -1023,21 +959,13 @@ function DashboardContent() {
                   className="!hidden"
                 />
 
-                <div className="!flex !flex-col sm:!flex-row !gap-8 !items-center">
-                  <div className="!relative !group">
-                    <div className="!w-24 !h-24 !bg-gray-100 !rounded-full !border-2 !border-gray-200 !flex !items-center !justify-center !overflow-hidden">
+                <div className="!flex !flex-col sm:!flex-row !gap-6 sm:!gap-8 !items-center">
+                  <div className="!relative !group !shrink-0">
+                    <div className="!w-20 md:!w-24 !h-20 md:!h-24 !bg-gray-100 !rounded-full !border-2 !border-gray-200 !flex !items-center !justify-center !overflow-hidden">
                       {profile?.avatar_url ? (
-                        <img
-                          src={profile.avatar_url}
-                          alt="Avatar"
-                          className="!w-full !h-full !object-cover"
-                        />
+                        <img src={profile.avatar_url} alt="Avatar" className="!w-full !h-full !object-cover" />
                       ) : (
-                        <svg
-                          className="!w-12 !h-12 !text-gray-300 !mt-2"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg className="!w-10 md:!w-12 !h-10 md:!h-12 !text-gray-300 !mt-2" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                         </svg>
                       )}
@@ -1045,67 +973,47 @@ function DashboardContent() {
                     <button
                       onClick={() => avatarInputRef.current?.click()}
                       disabled={uploadingAvatar}
-                      className="!absolute !bottom-0 !right-0 !bg-sky-500 hover:!bg-sky-600 !text-white !p-2 !rounded-full !shadow-lg hover:!scale-110 disabled:!opacity-50 !transition-transform"
+                      className="!absolute !bottom-0 !right-0 !bg-sky-500 hover:!bg-sky-600 !text-white !p-1.5 md:!p-2 !rounded-full !shadow-lg hover:!scale-110 disabled:!opacity-50 !transition-transform"
                     >
                       {profile?.avatar_url ? (
-                        <svg
-                          className="!w-4 !h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                          ></path>
+                        <svg className="!w-4 !h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                         </svg>
                       ) : (
-                        <svg
-                          className="!w-4 !h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg className="!w-4 !h-4" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                           <path d="M12 4v16m8-8H4"></path>
                         </svg>
                       )}
                     </button>
                   </div>
-                  <div className="!flex-1 !flex !flex-col !gap-3">
+                  <div className="!flex-1 !flex !flex-col !gap-2 md:!gap-3 !w-full">
                     <button
                       onClick={() => avatarInputRef.current?.click()}
                       disabled={uploadingAvatar}
-                      className="!bg-sky-500 !text-white !font-bold !py-3 !px-6 !rounded-full !w-full sm:!w-max hover:!bg-sky-600 disabled:!opacity-50 !transition-colors !text-[15px]"
+                      className="!bg-sky-500 !text-white !font-bold !py-2.5 md:!py-3 !px-6 !rounded-full !w-full sm:!w-max hover:!bg-sky-600 disabled:!opacity-50 !transition-colors !text-[14px] md:!text-[15px]"
                     >
                       {uploadingAvatar ? "Carregando..." : "Alterar foto"}
                     </button>
                     <button
                       onClick={handleRemoveAvatar}
                       disabled={uploadingAvatar || !profile?.avatar_url}
-                      className="!bg-gray-100 !text-gray-600 !font-bold !py-3 !px-6 !rounded-full !w-full sm:!w-max hover:!bg-gray-200 disabled:!opacity-50 disabled:!cursor-not-allowed !transition-colors !text-[15px]"
+                      className="!bg-gray-100 !text-gray-600 !font-bold !py-2.5 md:!py-3 !px-6 !rounded-full !w-full sm:!w-max hover:!bg-gray-200 disabled:!opacity-50 disabled:!cursor-not-allowed !transition-colors !text-[14px] md:!text-[15px]"
                     >
                       Remover
                     </button>
                   </div>
                 </div>
 
-                <div className="!border-t !border-gray-100 !pt-8 !mt-8">
-                  <h3 className="!font-bold !text-xl !mb-4">Foto de Capa</h3>
+                <div className="!border-t !border-gray-100 !pt-6 md:!pt-8 !mt-6 md:!mt-8">
+                  <h3 className="!font-bold !text-[18px] md:!text-xl !mb-4">Foto de Capa</h3>
                   {profile?.cover_url ? (
-                    <div className="!flex !flex-col !gap-4">
-                      <div className="!w-full !h-32 !rounded-2xl !overflow-hidden !border !border-gray-200 !shadow-sm !relative">
-                        <img
-                          src={profile.cover_url}
-                          alt="Cover"
-                          className="!w-full !h-full !object-cover"
-                        />
+                    <div className="!flex !flex-col !gap-3 md:!gap-4">
+                      <div className="!w-full !h-24 md:!h-32 !rounded-2xl !overflow-hidden !border !border-gray-200 !shadow-sm !relative">
+                        <img src={profile.cover_url} alt="Cover" className="!w-full !h-full !object-cover" />
                         <div className="!absolute !inset-0 !bg-black/20 !flex !items-center !justify-center !opacity-0 hover:!opacity-100 !transition-opacity">
                           <button
                             onClick={() => coverInputRef.current?.click()}
-                            className="!bg-white !text-black !font-bold !px-6 !py-2 !rounded-full !shadow-lg hover:!scale-105 !transition-transform !text-[15px]"
+                            className="!bg-white !text-black !font-bold !px-4 md:!px-6 !py-1.5 md:!py-2 !rounded-full !shadow-lg hover:!scale-105 !transition-transform !text-[13px] md:!text-[15px]"
                           >
                             {uploadingCover ? "Carregando..." : "Alterar Capa"}
                           </button>
@@ -1115,7 +1023,7 @@ function DashboardContent() {
                         <button
                           onClick={handleRemoveCover}
                           disabled={uploadingCover}
-                          className="!text-red-500 !font-bold hover:!text-red-600 !text-[15px]"
+                          className="!text-red-500 !font-bold hover:!text-red-600 !text-[14px] md:!text-[15px]"
                         >
                           Remover capa
                         </button>
@@ -1124,235 +1032,174 @@ function DashboardContent() {
                   ) : (
                     <div
                       onClick={() => coverInputRef.current?.click()}
-                      className={`!w-full !h-32 !bg-gray-50 !rounded-2xl !border-2 !border-dashed !border-gray-300 !flex !flex-col !items-center !justify-center !gap-2 hover:!bg-gray-100 !cursor-pointer !transition-colors ${
+                      className={`!w-full !h-24 md:!h-32 !bg-gray-50 !rounded-2xl !border-2 !border-dashed !border-gray-300 !flex !flex-col !items-center !justify-center !gap-1 md:!gap-2 hover:!bg-gray-100 !cursor-pointer !transition-colors ${
                         uploadingCover ? "!opacity-50 !pointer-events-none" : ""
                       }`}
                     >
-                      <svg
-                        className="!w-8 !h-8 !text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        ></path>
+                      <svg className="!w-6 md:!w-8 !h-6 md:!h-8 !text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                       </svg>
-                      <span className="!text-[15px] !text-gray-500 !font-bold">
-                        {uploadingCover
-                          ? "Enviando..."
-                          : "Adicionar Imagem de Capa"}
+                      <span className="!text-[13px] md:!text-[15px] !text-gray-500 !font-bold">
+                        {uploadingCover ? "Enviando..." : "Adicionar Capa"}
                       </span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* SESSÃO: TEMAS E CORES */}
-              <div className="!border-t !border-gray-100 !pt-8">
-                <h3 className="!font-bold !text-[22px] !mb-2">Temas e Cores</h3>
-                <p className="!text-gray-500 !text-[15px] !mb-6">
+              <div className="!border-t !border-gray-100 !pt-6 md:!pt-8">
+                <h3 className="!font-bold !text-[20px] md:!text-[22px] !mb-1 md:!mb-2">Temas e Cores</h3>
+                <p className="!text-gray-500 !text-[14px] md:!text-[15px] !mb-6">
                   Escolha um estilo visual ou crie a sua própria cor personalizada.
                 </p>
 
-                <div className="!grid !grid-cols-2 md:!grid-cols-4 !gap-4 !mb-8">
+                <div className="!grid !grid-cols-2 md:!grid-cols-4 !gap-3 md:!gap-4 !mb-6 md:!mb-8">
                   {/* Tema: Claro */}
                   <div
                     onClick={() => handleUpdateTheme("light")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "light"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "light" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-gray-50 !border !border-gray-200 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-gray-300 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-gray-50 !border !border-gray-200 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-gray-300 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Claro
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Claro</p>
                   </div>
-
                   {/* Tema: Escuro */}
                   <div
                     onClick={() => handleUpdateTheme("dark")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "dark"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "dark" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-[#1A1A1A] !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-gray-600 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-[#1A1A1A] !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-gray-600 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Escuro
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Escuro</p>
                   </div>
-
                   {/* Tema: Sunset */}
                   <div
                     onClick={() => handleUpdateTheme("sunset")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "sunset"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "sunset" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-gradient-to-br !from-orange-400 !to-pink-600 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/30 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-gradient-to-br !from-orange-400 !to-pink-600 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/30 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Sunset
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Sunset</p>
                   </div>
-
                   {/* Tema: Ocean */}
                   <div
                     onClick={() => handleUpdateTheme("ocean")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "ocean"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "ocean" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-gradient-to-br !from-sky-400 !to-blue-700 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/30 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-gradient-to-br !from-sky-400 !to-blue-700 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/30 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Ocean
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Ocean</p>
                   </div>
-
                   {/* Tema: Forest */}
                   <div
                     onClick={() => handleUpdateTheme("forest")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "forest"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "forest" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-gradient-to-br !from-emerald-400 !to-teal-700 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/30 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-gradient-to-br !from-emerald-400 !to-teal-700 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/30 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Forest
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Forest</p>
                   </div>
-
                   {/* Tema: Berry */}
                   <div
                     onClick={() => handleUpdateTheme("berry")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "berry"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "berry" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-gradient-to-br !from-rose-400 !to-purple-700 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/30 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-gradient-to-br !from-rose-400 !to-purple-700 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/30 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Berry
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Berry</p>
                   </div>
-
                   {/* Tema: Midnight */}
                   <div
                     onClick={() => handleUpdateTheme("midnight")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "midnight"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "midnight" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-[#0B1021] !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/10 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-[#0B1021] !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/10 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Midnight
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Midnight</p>
                   </div>
-
                   {/* Tema: Monochrome */}
                   <div
                     onClick={() => handleUpdateTheme("monochrome")}
-                    className={`!cursor-pointer !rounded-2xl !p-2 !border-2 !transition-all hover:!scale-105 ${
-                      currentTheme === "monochrome"
-                        ? "!border-sky-500"
-                        : "!border-transparent"
+                    className={`!cursor-pointer !rounded-2xl !p-1.5 md:!p-2 !border-2 !transition-all hover:!scale-105 ${
+                      currentTheme === "monochrome" ? "!border-sky-500" : "!border-transparent"
                     }`}
                   >
-                    <div className="!w-full !h-24 !bg-zinc-500 !rounded-xl !flex !items-center !justify-center">
-                      <div className="!w-1/2 !h-3 !bg-white/40 !rounded-full"></div>
+                    <div className="!w-full !h-20 md:!h-24 !bg-zinc-500 !rounded-xl !flex !items-center !justify-center">
+                      <div className="!w-1/2 !h-2 md:!h-3 !bg-white/40 !rounded-full"></div>
                     </div>
-                    <p className="!text-center !text-[15px] !font-bold !mt-2">
-                      Monochrome
-                    </p>
+                    <p className="!text-center !text-[13px] md:!text-[15px] !font-bold !mt-2">Monochrome</p>
                   </div>
                 </div>
 
-                <div className="!grid !grid-cols-1 md:!grid-cols-2 !gap-6">
-                  
+                <div className="!grid !grid-cols-1 md:!grid-cols-2 !gap-4 md:!gap-6">
                   {/* Bloco: Cor Sólida Personalizada */}
-                  <div className="!bg-gray-50 !p-6 !rounded-2xl !border !border-gray-200">
-                    <h4 className="!font-bold !text-[16px] !mb-2">Cor Sólida</h4>
-                    <p className="!text-[14px] !text-gray-500 !mb-4">
-                      Escolha a cor da sua marca.
-                    </p>
-                    <div className="!flex !items-center !gap-4">
+                  <div className="!bg-gray-50 !p-5 md:!p-6 !rounded-2xl !border !border-gray-200">
+                    <h4 className="!font-bold !text-[15px] md:!text-[16px] !mb-1 md:!mb-2">Cor Sólida</h4>
+                    <p className="!text-[13px] md:!text-[14px] !text-gray-500 !mb-3 md:!mb-4">Escolha a cor da sua marca.</p>
+                    <div className="!flex !items-center !gap-3 md:!gap-4">
                       <input
                         type="color"
                         value={customColor}
                         onChange={(e) => setCustomColor(e.target.value)}
-                        className="!w-14 !h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
+                        className="!w-12 !h-12 md:!w-14 md:!h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
                       />
                       <button
                         onClick={() => handleUpdateTheme(customColor)}
-                        className="!bg-black hover:!bg-gray-800 !text-white !font-bold !py-3 !px-6 !rounded-full !transition-colors !text-[15px]"
+                        className="!bg-black hover:!bg-gray-800 !text-white !font-bold !py-2.5 md:!py-3 !px-5 md:!px-6 !rounded-full !transition-colors !text-[14px] md:!text-[15px]"
                       >
-                        Aplicar Cor
+                        Aplicar
                       </button>
                     </div>
                   </div>
-
                   {/* Bloco: Gradiente Personalizado */}
-                  <div className="!bg-gray-50 !p-6 !rounded-2xl !border !border-gray-200">
-                    <h4 className="!font-bold !text-[16px] !mb-2">Gradiente Personalizado</h4>
-                    <p className="!text-[14px] !text-gray-500 !mb-4">
-                      Misture duas cores únicas.
-                    </p>
-                    <div className="!flex !items-center !gap-4">
+                  <div className="!bg-gray-50 !p-5 md:!p-6 !rounded-2xl !border !border-gray-200">
+                    <h4 className="!font-bold !text-[15px] md:!text-[16px] !mb-1 md:!mb-2">Gradiente Personalizado</h4>
+                    <p className="!text-[13px] md:!text-[14px] !text-gray-500 !mb-3 md:!mb-4">Misture duas cores únicas.</p>
+                    <div className="!flex !items-center !gap-3 md:!gap-4">
                       <div className="!flex !gap-1">
                         <input
                           type="color"
                           value={customGrad1}
                           onChange={(e) => setCustomGrad1(e.target.value)}
-                          className="!w-10 !h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
+                          className="!w-10 !h-12 md:!w-10 md:!h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
                         />
                         <input
                           type="color"
                           value={customGrad2}
                           onChange={(e) => setCustomGrad2(e.target.value)}
-                          className="!w-10 !h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
+                          className="!w-10 !h-12 md:!w-10 md:!h-14 !p-1 !rounded-xl !cursor-pointer !bg-white !border !border-gray-300"
                         />
                       </div>
                       <button
-                        onClick={() =>
-                          handleUpdateTheme(
-                            `gradient:${customGrad1},${customGrad2}`
-                          )
-                        }
-                        className="!bg-black hover:!bg-gray-800 !text-white !font-bold !py-3 !px-6 !rounded-full !transition-colors !text-[15px]"
+                        onClick={() => handleUpdateTheme(`gradient:${customGrad1},${customGrad2}`)}
+                        className="!bg-black hover:!bg-gray-800 !text-white !font-bold !py-2.5 md:!py-3 !px-5 md:!px-6 !rounded-full !transition-colors !text-[14px] md:!text-[15px]"
                       >
                         Aplicar
                       </button>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           )}
@@ -1361,13 +1208,13 @@ function DashboardContent() {
           {/* ABA: CONFIGURAÇÕES                         */}
           {/* ========================================== */}
           {activeTab === "config" && (
-            <div className="!bg-white !p-8 !rounded-3xl border border-gray-200 shadow-sm !flex !flex-col !gap-10">
+            <div className="!bg-white !p-6 md:!p-8 !rounded-3xl border border-gray-200 shadow-sm !flex !flex-col !gap-8 md:!gap-10">
               
               <div>
-                <h2 className="!text-[28px] !font-bold !text-black !font-sans !mb-2">
+                <h2 className="!text-[24px] md:!text-[28px] !font-bold !text-black !font-sans !mb-1 md:!mb-2">
                   Informações do Perfil
                 </h2>
-                <p className="!text-gray-500 !mb-6 !text-[15px]">
+                <p className="!text-gray-500 !mb-6 !text-[14px] md:!text-[15px]">
                   Edite o seu nome de usuário público e a sua biografia.
                 </p>
 
@@ -1375,28 +1222,28 @@ function DashboardContent() {
                   onSubmit={handleUpdateProfile}
                   className="!flex !flex-col !gap-5"
                 >
-                  <div className="!flex !flex-col !gap-2">
-                    <label className="!font-bold !text-[15px] !text-gray-700">
+                  <div className="!flex !flex-col !gap-1.5 md:!gap-2">
+                    <label className="!font-bold !text-[14px] md:!text-[15px] !text-gray-700">
                       Nome de Exibição
                     </label>
                     <input
                       type="text"
-                      placeholder="Seu nome ou nome da marca"
+                      placeholder="Seu nome ou marca"
                       value={editDisplayName}
                       onChange={(e) => setEditDisplayName(e.target.value)}
-                      className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 !transition-all !bg-white !text-black !font-semibold !text-[16px]"
+                      className="!w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 !transition-all !bg-white !text-black !font-semibold !text-[15px] md:!text-[16px]"
                     />
-                    <span className="!text-[13px] !text-gray-500">
-                      Este é o nome que aparece grande no seu perfil. Aceita espaços e maiúsculas.
+                    <span className="!text-[12px] md:!text-[13px] !text-gray-500">
+                      Aparece grande no perfil. Aceita espaços e maiúsculas.
                     </span>
                   </div>
 
-                  <div className="!flex !flex-col !gap-2">
-                    <label className="!font-bold !text-[15px] !text-gray-700">
+                  <div className="!flex !flex-col !gap-1.5 md:!gap-2">
+                    <label className="!font-bold !text-[14px] md:!text-[15px] !text-gray-700">
                       Nome de Usuário (URL)
                     </label>
-                    <div className="!flex !items-center !w-full !h-12 !px-4 !rounded-xl border border-gray-300 focus-within:!border-sky-500 focus-within:!ring-1 focus-within:!ring-sky-500 !transition-all !bg-white">
-                      <span className="!text-gray-400 !font-semibold !mr-1 !text-[16px]">
+                    <div className="!flex !items-center !w-full !h-12 !px-3 md:!px-4 !rounded-xl border border-gray-300 focus-within:!border-sky-500 focus-within:!ring-1 focus-within:!ring-sky-500 !transition-all !bg-white">
+                      <span className="!text-gray-400 !font-semibold !mr-1 !text-[14px] md:!text-[16px]">
                         bioflow.com/
                       </span>
                       <input
@@ -1411,16 +1258,16 @@ function DashboardContent() {
                               .replace(/[^a-z0-9_.-]/g, "")
                           )
                         }
-                        className="!w-full !h-full !bg-transparent focus:!outline-none !text-black !font-semibold !text-[16px]"
+                        className="!w-full !h-full !bg-transparent focus:!outline-none !text-black !font-semibold !text-[15px] md:!text-[16px] !min-w-0"
                       />
                     </div>
-                    <span className="!text-[13px] !text-gray-500">
-                      Este é o link que você compartilha. Não pode conter espaços ou letras maiúsculas.
+                    <span className="!text-[12px] md:!text-[13px] !text-gray-500">
+                      Seu link público. Sem espaços ou maiúsculas.
                     </span>
                   </div>
 
-                  <div className="!flex !flex-col !gap-2">
-                    <label className="!font-bold !text-[15px] !text-gray-700">
+                  <div className="!flex !flex-col !gap-1.5 md:!gap-2">
+                    <label className="!font-bold !text-[14px] md:!text-[15px] !text-gray-700">
                       Biografia
                     </label>
                     <textarea
@@ -1429,9 +1276,9 @@ function DashboardContent() {
                       placeholder="Conte ao mundo quem você é..."
                       value={editBio}
                       onChange={(e) => setEditBio(e.target.value)}
-                      className="!w-full !p-4 !rounded-xl border border-gray-300 focus:!outline-none focus:!border-sky-500 focus:!ring-1 focus:!ring-sky-500 !resize-none !text-[16px]"
+                      className="!w-full !p-4 !rounded-xl border border-gray-300 focus:!outline-none focus:!border-sky-500 focus:!ring-1 focus:!ring-sky-500 !resize-none !text-[15px] md:!text-[16px]"
                     />
-                    <span className="!text-[13px] !text-gray-400 !self-end">
+                    <span className="!text-[12px] md:!text-[13px] !text-gray-400 !self-end">
                       {editBio.length}/150
                     </span>
                   </div>
@@ -1439,23 +1286,23 @@ function DashboardContent() {
                   <button
                     type="submit"
                     disabled={savingProfile || !editUsername}
-                    className="!w-full md:!w-max !self-end !px-8 !py-3.5 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !rounded-full !transition-colors disabled:!opacity-50 !text-[15px]"
+                    className="!w-full md:!w-max !self-end !px-8 !py-3.5 !bg-sky-500 hover:!bg-sky-600 !text-white !font-bold !rounded-full !transition-colors disabled:!opacity-50 !text-[14px] md:!text-[15px]"
                   >
                     {savingProfile ? "Salvando..." : "Salvar Alterações"}
                   </button>
                 </form>
               </div>
 
-              <div className="!border-t !border-gray-100 !pt-8">
-                <h2 className="!text-[22px] !font-bold !text-black !font-sans !mb-2">
+              <div className="!border-t !border-gray-100 !pt-6 md:!pt-8">
+                <h2 className="!text-[20px] md:!text-[22px] !font-bold !text-black !font-sans !mb-1 md:!mb-2">
                   Compartilhar Perfil
                 </h2>
-                <p className="!text-gray-500 !mb-6 !text-[15px]">
-                  Copie o link abaixo para adicionar na bio do seu Instagram ou TikTok.
+                <p className="!text-gray-500 !mb-4 md:!mb-6 !text-[14px] md:!text-[15px]">
+                  Copie o link abaixo para adicionar nas suas redes.
                 </p>
 
-                <div className="!flex !items-center !gap-3 !bg-gray-50 !p-2 !rounded-xl border border-gray-200">
-                  <div className="!flex-1 !px-3 !truncate !text-gray-600 !font-medium !text-[15px]">
+                <div className="!flex !flex-col sm:!flex-row !items-stretch sm:!items-center !gap-3 !bg-gray-50 !p-2 md:!p-2 !rounded-xl border border-gray-200">
+                  <div className="!flex-1 !px-2 md:!px-3 !py-2 sm:!py-0 !truncate !text-gray-600 !font-medium !text-[14px] md:!text-[15px]">
                     {typeof window !== "undefined"
                       ? `${window.location.origin}/${
                           profile?.username
@@ -1470,9 +1317,9 @@ function DashboardContent() {
                   </div>
                   <button
                     onClick={copyToClipboard}
-                    className="!shrink-0 !bg-black hover:!bg-gray-800 !text-white !font-bold !py-2.5 !px-6 !rounded-lg !transition-colors !text-[15px]"
+                    className="!w-full sm:!w-auto !shrink-0 !bg-black hover:!bg-gray-800 !text-white !font-bold !py-2.5 !px-6 !rounded-lg !transition-colors !text-[14px] md:!text-[15px]"
                   >
-                    Copiar
+                    Copiar Link
                   </button>
                 </div>
               </div>
@@ -1483,88 +1330,64 @@ function DashboardContent() {
         {/* ==================================================== */}
         {/* LADO DIREITO (CELULAR VIRTUAL DE PREVIEW)            */}
         {/* ==================================================== */}
-        <div className="!w-[340px] !shrink-0 !flex !justify-center !sticky !top-28">
-          <div className="!w-[320px] !h-[640px] border-[12px] border-black !rounded-[45px] !bg-white shadow-2xl !relative !overflow-hidden !flex !flex-col !items-center !px-0">
+        {/* 👇 CORRIGIDO: Retirado o sticky mobile, ele agora fica fixo abaixo das formas 👇 */}
+        <div className="!w-full lg:!w-[340px] !shrink-0 !flex !justify-center lg:!sticky lg:!top-28 !mb-8 lg:!mb-0">
+          <div className="!w-[300px] md:!w-[320px] !h-[600px] md:!h-[640px] border-[10px] md:border-[12px] border-black !rounded-[40px] md:!rounded-[45px] !bg-white shadow-2xl !relative !overflow-hidden !flex !flex-col !items-center !px-0">
             
-            {/* "Notch" do Celular */}
-            <div className="!absolute !top-0 !inset-x-0 !h-6 !w-36 !bg-black !mx-auto !rounded-b-2xl z-20"></div>
+            <div className="!absolute !top-0 !inset-x-0 !h-5 md:!h-6 !w-32 md:!w-36 !bg-black !mx-auto !rounded-b-2xl z-20"></div>
 
-            {/* Tela Interna com Tema Dinâmico */}
             <div
-              className={`!w-full !h-full !flex !flex-col !items-center !text-center !overflow-y-auto relative z-0 ${getThemeBackgroundClass()}`}
+              className={`!w-full !h-full !flex !flex-col !items-center !text-center !overflow-y-auto relative z-0 hide-scrollbar ${getThemeBackgroundClass()}`}
               style={getDynamicStyle()}
             >
-              
-              {/* Cover */}
               <div
-                className={`!w-full !h-32 ${
+                className={`!w-full !h-28 md:!h-32 ${
                   darkTextNeeded ? "!bg-white/10" : "!bg-gray-100"
                 } !relative !shrink-0`}
               >
                 {profile?.cover_url && (
-                  <img
-                    src={profile.cover_url}
-                    alt="Capa"
-                    className="!w-full !h-full !object-cover"
-                  />
+                  <img src={profile.cover_url} alt="Capa" className="!w-full !h-full !object-cover" />
                 )}
               </div>
 
-              {/* Avatar */}
               <div
-                className={`!w-24 !h-24 ${
-                  darkTextNeeded
-                    ? "!bg-gray-800 !border-[#1A1A1A]"
-                    : "!bg-white !border-white"
-                } !rounded-full !border-4 !shadow-sm !flex !items-center !justify-center !shrink-0 !-mt-12 !relative !z-10 !overflow-hidden`}
+                className={`!w-20 md:!w-24 !h-20 md:!h-24 ${
+                  darkTextNeeded ? "!bg-gray-800 !border-[#1A1A1A]" : "!bg-white !border-white"
+                } !rounded-full !border-4 !shadow-sm !flex !items-center !justify-center !shrink-0 !-mt-10 md:!-mt-12 !relative !z-10 !overflow-hidden`}
                 style={{
-                  borderColor: currentTheme.startsWith("#")
-                    ? currentTheme
-                    : undefined,
+                  borderColor: currentTheme.startsWith("#") ? currentTheme : undefined,
                 }}
               >
                 {profile?.avatar_url ? (
-                  <img
-                    src={profile.avatar_url}
-                    alt="Avatar"
-                    className="!w-full !h-full !object-cover"
-                  />
+                  <img src={profile.avatar_url} alt="Avatar" className="!w-full !h-full !object-cover" />
                 ) : (
                   <div className="!w-full !h-full !bg-gray-200 !flex !items-center !justify-center">
-                    <svg
-                      className="!w-14 !h-14 !text-gray-400 !mt-2"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="!w-12 md:!w-14 !h-12 md:!h-14 !text-gray-400 !mt-2" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg>
                   </div>
                 )}
               </div>
 
-              {/* Informações Pessoais - LIVE PREVIEW DO NOME DE EXIBIÇÃO */}
               <div className="!px-4 !w-full !flex !flex-col !items-center">
                 <h1
-                  className={`!text-[22px] !font-bold !mt-2 !mb-1 !tracking-tight !font-sans ${
+                  className={`!text-[20px] md:!text-[22px] !font-bold !mt-2 !mb-1 !tracking-tight !font-sans ${
                     darkTextNeeded ? "!text-white" : "!text-gray-900"
                   }`}
                 >
-                  {/* LIVE PREVIEW: Se estiver digitando, mostra. Senão, mostra o salvo. */}
                   {(activeTab === "config" ? editDisplayName : profile?.display_name) ||
                    (activeTab === "config" ? editUsername : profile?.username) ||
                    "Seu Nome"}
                 </h1>
                 
                 <p
-                  className={`!text-[15px] !mb-6 !max-w-[260px] !break-words !font-sans ${
+                  className={`!text-[14px] md:!text-[15px] !mb-6 !max-w-[240px] md:!max-w-[260px] !break-words !font-sans ${
                     darkTextNeeded ? "!text-white/80" : "!text-gray-600"
                   }`}
                 >
-                  {/* LIVE PREVIEW: Biografia */}
                   {(activeTab === "config" ? editBio : profile?.bio) || "Sua biografia aparecerá aqui."}
                 </p>
 
-                {/* Lista de Links Renderizados no Preview */}
                 <div className="!w-full !flex !flex-col !gap-3 !pb-24">
                   {links
                     .filter((l) => l.is_active)
@@ -1574,20 +1397,19 @@ function DashboardContent() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`!w-full !py-3.5 !px-4 !rounded-xl !text-[15px] !font-semibold shadow-sm !transition-colors !truncate !flex !items-center !justify-center !relative ${
+                        className={`!w-full !py-3.5 !px-4 !rounded-xl !text-[14px] md:!text-[15px] !font-semibold shadow-sm !transition-colors !truncate !flex !items-center !justify-center !relative ${
                           darkTextNeeded
                             ? "!bg-white/10 !text-white hover:!bg-white/20 !border !border-white/10"
                             : "!bg-white !text-gray-800 hover:!bg-gray-50 border border-gray-200"
                         }`}
                       >
                         {link.image_url && (
-                          <img src={link.image_url} className="!w-6 !h-6 !rounded-md !object-cover !absolute !left-3" alt="" />
+                          <img src={link.image_url} className="!w-5 md:!w-6 !h-5 md:!h-6 !rounded-md !object-cover !absolute !left-3" alt="" />
                         )}
                         {link.title}
                       </a>
                     ))}
 
-                  {/* Skeleton Animado (se não houver links ativos) */}
                   {links.filter((l) => l.is_active).length === 0 && (
                     <div
                       className={`!w-full !h-12 !rounded-xl animate-pulse ${
@@ -1598,29 +1420,20 @@ function DashboardContent() {
                 </div>
               </div>
 
-              {/* BRANDING FOOTER / MARCA D'ÁGUA (PLG) */}
               <div className="!absolute !bottom-4 !inset-x-0 !flex !justify-center !z-20">
                 <div
-                  className={`!backdrop-blur-md !px-4 !py-2 !rounded-full !shadow-lg !flex !items-center !gap-2 !cursor-pointer hover:!scale-105 !transition-transform ${
+                  className={`!backdrop-blur-md !px-3 md:!px-4 !py-1.5 md:!py-2 !rounded-full !shadow-lg !flex !items-center !gap-1.5 md:!gap-2 !cursor-pointer hover:!scale-105 !transition-transform ${
                     darkTextNeeded
                       ? "!bg-black/40 !border !border-white/10"
                       : "!bg-white/90 !border !border-gray-200"
                   }`}
                 >
-                  <svg
-                    className="!w-4 !h-4 !text-sky-500"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                  <svg className="!w-3.5 md:!w-4 !h-3.5 md:!h-4 !text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
                   <span
-                    className={`!text-[11px] !font-bold !font-sans ${
+                    className={`!text-[10px] md:!text-[11px] !font-bold !font-sans ${
                       darkTextNeeded ? "!text-white" : "!text-black"
                     }`}
                   >
